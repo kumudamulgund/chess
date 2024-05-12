@@ -30,7 +30,6 @@ export default class Queen extends Piece {
                 moves.push(possiblePosition);
             }
         });
-        console.log(moves, "---all moves");
         return moves;
     }
 }

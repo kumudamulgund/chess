@@ -3,10 +3,18 @@ export default class Chessboard {
 
     private _rows:number;
     private _columns:string;
+    private static instance: Chessboard | null = null;
 
-    constructor() {
+    private constructor() {
         this._rows = 8;
         this._columns = "H";
+    }
+
+    public static getInstance(): Chessboard {
+        if(!Chessboard.instance) {
+            Chessboard.instance = new Chessboard();
+        }
+        return Chessboard.instance;
     }
 
     isValidPosition(row:number, col:string):boolean {

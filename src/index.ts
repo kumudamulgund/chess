@@ -10,7 +10,7 @@ const main = () => {
         output: process.stdout
     });
 
-    const chessboard = new Chessboard();
+    const chessboard = Chessboard.getInstance();
     readline.question('Enter piece type and position (e.g., Pawn, G1): ', input => {
         const [pieceType, position] = input.trim().split(', ');
         const piece = pieceType.toLowerCase() === 'pawn' ? new Pawn(position) :
