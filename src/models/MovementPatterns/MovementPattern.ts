@@ -2,7 +2,7 @@ import IValidation from "../Validations/IValidation";
 
 export default abstract class MovementPattern {
 
-    protected isMoveValid(validations:IValidation[], row, col):boolean {
+    protected isPositionValid(validations:IValidation[], row:number, col:string):boolean {
         return validations.reduce((isValid, validation) => {
             return isValid && validation.validate(row, col);
         },true);

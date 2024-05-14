@@ -27,9 +27,10 @@ export default class Piece {
             throw new Error("Not a valid position");
         }
         return this._movementPatterns.reduce((acc:string[], pattern:IMovementPattern) => {
-            const moves = pattern.getPossibleMoves(position, this._validations);
-            acc.push(...moves);
-            return acc;
+                
+                const moves = pattern.getPossibleMoves(position, this._validations);
+                acc.push(...moves);
+                return acc;
         }, [])
     }
 }

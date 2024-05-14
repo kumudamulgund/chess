@@ -15,12 +15,15 @@ export default class KingPattern extends MovementPattern {
     }
 
     getPossibleMoves(position:string, validations:IValidation[]): string[] {
-        const moves: string[] = [];
         const [col, row] = position;
+        if(!this.isPositionValid(validations, parseInt(row), col)) {
+            throw new Error("Invalid position");
+        }
+        const moves: string[] = [];
         this._directions.forEach(([dr, dc]) => {
             const newRow = parseInt(row) + dr;
             const newCol = String.fromCharCode(col.charCodeAt(0) + dc);
-            if (this.isMoveValid(validations, newRow, newCol)) {
+            if (this.isPositionValid(validations, newRow, newCol)) {
                 const newPosition = newCol + newRow;
                 moves.push(newPosition);
             }
