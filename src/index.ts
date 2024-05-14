@@ -1,10 +1,7 @@
 import { Interface, createInterface } from "readline";
 import Piece from "./models/Pieces/Piece";
-import { BasicValidation } from "./models/Validations/BasicValidation";
-import KingPattern from "./models/MovementPatterns/KingPattern";
-import PawnPattern from "./models/MovementPatterns/PawnPattern";
-import { BishopPattern } from "./models/MovementPatterns/BishopPattern";
-import { RookPattern } from "./models/MovementPatterns/RookPattern";
+import { createPieceFromInput } from "./factories/Factory";
+
 
 interface PieceInfo {
     piece:Piece,
@@ -19,7 +16,7 @@ const main = async() => {
     try {
         const pieceInfo = await getInput(readline);
         getPossibleMoves(pieceInfo);
-    } catch (error) {
+    } catch (error:any) {
         console.error(error.message);
     } finally {
         readline.close();
@@ -31,29 +28,17 @@ const getInput = async (readline: Interface): Promise<PieceInfo> => {
     return new Promise((resolve, reject) => {
         readline.question('Enter piece type and position (e.g., Pawn, G1): ', input => {
             const [pieceType, position] = input.trim().split(', ');
-            const piece = createPieceFromInput(pieceType.toLowerCase().trim());
-            if (!piece) {
-                reject(new Error("Invalid Input. Possible piece names: King, Queen, Pawn"));
-            } else {
+            try {
+                const piece = createPieceFromInput(pieceType.toLowerCase().trim());
                 resolve({piece:piece, position:position});
+            } catch (err) {
+                reject(new Error("Invalid Input. Possible piece names: King, Queen, Pawn"));
             }
         });
     });
 }
 
-const createPieceFromInput = (type:string):Piece => {
-    let piece:Piece;
-    switch(type) {
-        case "king": piece = new Piece("king", [new BasicValidation()], [new KingPattern()]);
-            break;
-        case "pawn": piece = new Piece("pawn",  [new BasicValidation()], [new PawnPattern()]);
-            break;
-        case "queen": piece = new Piece("queen", [new BasicValidation()], [new BishopPattern(), new RookPattern()])
-            break;
-        default: piece = null;
-    }
-    return piece;
-}
+
 
 
 const getPossibleMoves = (pieceInfo:PieceInfo) => {
@@ -61,7 +46,7 @@ const getPossibleMoves = (pieceInfo:PieceInfo) => {
         const{piece, position} = pieceInfo;
         const possibleMoves = piece.getPossibleMoves(position);
         console.log("Possible moves:", possibleMoves.join(', '));
-    } catch (err) {
+    } catch (err:any) {
         console.log("Error:", err.message);
     }
 }

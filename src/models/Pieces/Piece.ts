@@ -1,4 +1,3 @@
-import Chessboard from "../Chessboard/Chessboard";
 import IMovementPattern from "../MovementPatterns/MovementPattern";
 import IValidation from "../Validations/IValidation";
 
