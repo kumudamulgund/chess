@@ -17,7 +17,7 @@ export default class Chessboard {
         return Chessboard.instance;
     }
 
-    isValidPosition(row:number, col:string):boolean {
+    public isValidPosition(row:number, col:string):boolean {
         return row >= 1 && row <= this._rows && col >= 'A' && col <= 'H';
     }
 

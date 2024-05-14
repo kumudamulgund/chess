@@ -1,24 +1,26 @@
-import Chessboard from "../Chessboard/Chessboard";
 import { Direction } from "../Direction";
-import Piece from "./Piece";
+import IValidation from "../Validations/IValidation";
+import MovementPattern from "./MovementPattern";
 
-export default class King extends Piece {
+
+export default class KingPattern extends MovementPattern {
 
     private _directions:Direction[];
 
-    constructor(position:string) {
-        super(position);
+    constructor() {
+        super();
         this._directions = [[0, 1], [1, 0], [0, -1], [-1, 0],
             [1, 1], [-1, 1], [1, -1], [-1, -1]
         ];
     }
-    getPossibleMoves(chessboard: Chessboard): string[] {
+
+    getPossibleMoves(position:string, validations:IValidation[]): string[] {
         const moves: string[] = [];
-        const [col, row] = this.position;
+        const [col, row] = position;
         this._directions.forEach(([dr, dc]) => {
             const newRow = parseInt(row) + dr;
             const newCol = String.fromCharCode(col.charCodeAt(0) + dc);
-            if (chessboard.isValidPosition(newRow, newCol)) {
+            if (this.isMoveValid(validations, newRow, newCol)) {
                 const newPosition = newCol + newRow;
                 moves.push(newPosition);
             }

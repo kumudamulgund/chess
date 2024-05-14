@@ -1,84 +1,24 @@
-// import { Interface, createInterface } from "readline";
-// import Chessboard from "./models/Chessboard/Chessboard";
-// import King from "./models/Pieces/King";
-// import Pawn from "./models/Pieces/Pawn";
-// import Queen from "./models/Pieces/Queen";
-// import Piece from "./models/Pieces/Piece";
-
-// const main = () => {
-//     const chessboard = Chessboard.getInstance();
-//     getInputAndPossibleMoves(chessboard);
-// }
-
-// const getInput = (readline:Interface):Piece => {
-//     let piece:Piece;
-//     readline.question('Enter piece type and position (e.g., Pawn, G1): ', input => {
-//         const [pieceType, position] = input.trim().split(', ');
-//         piece = pieceType.toLowerCase() === 'pawn' ? new Pawn(position) :
-//             pieceType.toLowerCase() === 'king' ? new King(position) :
-//             pieceType.toLowerCase() === 'queen' ? new Queen(position) : null;
-
-//         if (!piece) {
-//            throw new Error("Invalid Input. Possible piece names: King, Queen, Pawn");
-//         }
-//     });
-//     return piece;
-// }
-
-// const getInputAndPossibleMoves = (chessBoard:Chessboard) => {
-//     const readline = createInterface({
-//         input: process.stdin,
-//         output: process.stdout
-//     });
-//     try {
-//         const piece = getInput(readline);
-//         const possibleMoves = piece.getPossibleMoves(chessBoard);
-//         console.log("Possible moves:", possibleMoves.join(', '));
-//     } catch (err) {
-//         console.log(err.message)
-//     } finally {
-//         readline.close();
-//         getInputAndPossibleMoves(chessBoard);
-//     }
-// }
-
-// main();
-
 import { Interface, createInterface } from "readline";
-import Chessboard from "./models/Chessboard/Chessboard";
-import King from "./models/Pieces/King";
-import Pawn from "./models/Pieces/Pawn";
-import Queen from "./models/Pieces/Queen";
 import Piece from "./models/Pieces/Piece";
+import { BasicValidation } from "./models/Validations/BasicValidation";
+import KingPattern from "./models/MovementPatterns/KingPattern";
+import PawnPattern from "./models/MovementPatterns/PawnPattern";
+import { BishopPattern } from "./models/MovementPatterns/BishopPattern";
+import { RookPattern } from "./models/MovementPatterns/RookPattern";
 
-const getInput = async (readline: Interface): Promise<Piece> => {
-    return new Promise((resolve, reject) => {
-        readline.question('Enter piece type and position (e.g., Pawn, G1): ', input => {
-            const [pieceType, position] = input.trim().split(', ');
-
-            const piece = pieceType.toLowerCase() === 'pawn' ? new Pawn(position) :
-                pieceType.toLowerCase() === 'king' ? new King(position) :
-                pieceType.toLowerCase() === 'queen' ? new Queen(position) : null;
-
-            if (!piece) {
-                reject(new Error("Invalid Input. Possible piece names: King, Queen, Pawn"));
-            } else {
-                resolve(piece);
-            }
-        });
-    });
+interface PieceInfo {
+    piece:Piece,
+    position:string
 }
-
 const main = async() => {
     const readline = createInterface({
         input: process.stdin,
         output: process.stdout
     });
 
-    const chessboard = Chessboard.getInstance();
     try {
-        const piece = await getInput(readline);
-        processPiece(piece, chessboard);
+        const pieceInfo = await getInput(readline);
+        getPossibleMoves(pieceInfo);
     } catch (error) {
         console.error(error.message);
     } finally {
@@ -87,9 +27,43 @@ const main = async() => {
     }
 }
 
-const processPiece = (piece: Piece, chessboard: Chessboard) => {
-    const possibleMoves = piece.getPossibleMoves(chessboard);
-    console.log("Possible moves:", possibleMoves.join(', '));
+const getInput = async (readline: Interface): Promise<PieceInfo> => {
+    return new Promise((resolve, reject) => {
+        readline.question('Enter piece type and position (e.g., Pawn, G1): ', input => {
+            const [pieceType, position] = input.trim().split(', ');
+            const piece = createPieceFromInput(pieceType.toLowerCase().trim());
+            if (!piece) {
+                reject(new Error("Invalid Input. Possible piece names: King, Queen, Pawn"));
+            } else {
+                resolve({piece:piece, position:position});
+            }
+        });
+    });
+}
+
+const createPieceFromInput = (type:string):Piece => {
+    let piece:Piece;
+    switch(type) {
+        case "king": piece = new Piece("king", [new BasicValidation()], [new KingPattern()]);
+            break;
+        case "pawn": piece = new Piece("pawn",  [new BasicValidation()], [new PawnPattern()]);
+            break;
+        case "queen": piece = new Piece("queen", [new BasicValidation()], [new BishopPattern(), new RookPattern()])
+            break;
+        default: piece = null;
+    }
+    return piece;
+}
+
+
+const getPossibleMoves = (pieceInfo:PieceInfo) => {
+    try {
+        const{piece, position} = pieceInfo;
+        const possibleMoves = piece.getPossibleMoves(position);
+        console.log("Possible moves:", possibleMoves.join(', '));
+    } catch (err) {
+        console.log("Error:", err.message);
+    }
 }
 
 main();
